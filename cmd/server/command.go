@@ -5,8 +5,8 @@ type commandID int
 const(
 	cmdEnterUsername commandID = iota //0
 	cmdChangeUsername
-	cmdJoin
-	cmdGet
+	// cmdJoinServer
+	cmdGetUsersList
 	cmdConnToUser
 	cmdConnToGp
 	cmdMsgToUser
