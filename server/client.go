@@ -17,33 +17,38 @@ type client struct{
 	isGuest bool
 }
 
-func (client *client) sendMsg(msg string){
-	client.conn.Write([]byte(msg))
+func (client *client) sendMsg(input string){
+	fmt.Printf("[#] Sending message to: %s|Msg: %s\n", client.conn.RemoteAddr().String(), input)
+	client.conn.Write([]byte(input+"\n"))
 }
 func (client *client) sendErr(err error) {
 	client.conn.Write([]byte("err: " + err.Error() + "\n"))
 }
 func (client *client) readInput(){
+	fmt.Printf("[#] Connection %s reading input...\n", client.conn.RemoteAddr().String())
 	for{
 
-		msg, err := bufio.NewReader(client.conn).ReadString('\n')
+		// client.conn.Read();
+		buffer, err := bufio.NewReader(client.conn).ReadBytes('\n')
+		input := string(buffer)
 		if err != nil{
 			return
 		}
+		fmt.Printf("[#] Input from user:%s\n", input)
 
-		msg = strings.Trim(msg,"\r\n")
-		args := strings.Split(msg, " ")
+		input = strings.Trim(input,"\r\n")
+		args := strings.Split(input, " ")
 		cmd := strings.TrimSpace(args[0])
+		input = strings.Join(args[1:len(args)]," ")
 	
 		if !client.isLoggedIn{
 			switch cmd{
 			case "/username":
-				client.checkUsername(strings.Join(args[1:len(args)]," "))
+				client.checkUsername(input)
 			case "/password":
-				client.checkPassword(strings.Join(args[1:len(args)]," "))
+				client.checkPassword(input)
 			}
 		}else{
-		
 			switch cmd{
 			case "/changeusername":
 
@@ -75,7 +80,7 @@ func (client *client) readInput(){
 
 			case "/quit":
 			default:
-				client.sendErr(fmt.Errorf("[FROM SERVER] Unkown command: %s", cmd))
+				client.sendErr(fmt.Errorf("[SERVER] Unkown command: %s", cmd))
 			}
 
 		}
@@ -88,17 +93,14 @@ func (client *client) checkUsername(username string){
 	//TODO
 	//TODO
 	if false{//Username already exists
-		client.sendMsg("[FROM SERVER] Please enter password")
+		client.sendMsg("[SERVER] Please enter password")
 		client.isGuest = false;
 
-		client.readInput()
 	}else{//New Username
 		client.isGuest = true;
 		client.username = username 
 		
-		client.sendMsg("[FROM SERVER] Please choose a password")
-		
-		client.readInput()
+		client.sendMsg("[SERVER] Please choose a password")
 	}
 }
 func (client *client) checkPassword(password string){

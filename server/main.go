@@ -6,9 +6,9 @@ import(
 )
 
 func main()  {
+	
 	server := newServer()	
-	// go server.run()
-
 	server.startListening()
+
 
 }

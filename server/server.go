@@ -8,7 +8,6 @@ import(
 )
 const(
 	port = 9000
-	messageSize = 128//Bytes
 )
 
 type server struct{
@@ -18,6 +17,7 @@ type server struct{
 }
 
 func newServer() *server{
+	fmt.Println("[#] Creating server struct...")
 	return &server{
 		groups: make(map[string]*group),
 		clients: make([]*client, 1),
@@ -29,18 +29,19 @@ func (server *server) startListening(){
 
 	listener, err := net.Listen("tcp4", ":"+strconv.Itoa(port))
 	if err != nil{
-		fmt.Println("[ERROR] Unable to listen: " + err.Error())
+		fmt.Println("[#ERROR] Unable to listen: " + err.Error())
 	}
 
+	fmt.Printf("[#] Listening on: %s\n", listener.Addr().String());
 	defer listener.Close()
 
 	for{
 		conn, err := listener.Accept()
 		if err!=nil{
-			fmt.Println("[ERROR] Failed to accept connecton: " + err.Error())
+			fmt.Println("[#ERROR] Failed to accept connecton: " + err.Error())
 			continue
 		}
-
+		conn.Write([]byte("sa;am chaghalll =))\n"))
 		go server.newConn(conn)
 	}	
 }
@@ -54,11 +55,13 @@ func (server *server) newConn(conn net.Conn){
 		isLoggedIn: false,
 		isGuest: true,
 	}
+	fmt.Printf("[#] New connection. addr:%s\n", conn.RemoteAddr().String());
 
 	newGuest.sendMsg("[FROM SERVER] Please enter username")
 	newGuest.readInput()
 }
 func (server *server) run(){
+	fmt.Println("[#] Listening to channel")
 	for cmd := range server.commands{
 		switch cmd.id{
 		case cmdChangeUsername:
