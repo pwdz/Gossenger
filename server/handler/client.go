@@ -1,21 +1,10 @@
-package main
+package handler
 
-import (
+import(
 	"fmt"
-	"net"
-	"bufio"
-	"strings"
+	"Gossenger/server/model"
 )
 
-type client struct{
-	conn net.Conn
-	username string
-	commands chan<- command  
-	gp *group
-	targetClient *client
-	isLoggedIn bool
-	isGuest bool
-}
 
 func (client *client) sendMsg(input string){
 	fmt.Printf("[#] Sending message to: %s|Msg: %s\n", client.conn.RemoteAddr().String(), input)
