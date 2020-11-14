@@ -4,13 +4,29 @@ import(
 	"fmt"
 	"net"
 	"strconv"
-	"strings"
+	// "strings"
+	"Gossenger/request"
+	"Gossenger/request/types"
 )
 const(
 	port = 9000
 )
 
-func (server *server) startListening(){
+type server struct{
+	groups map[string]*group 
+	clients []*Client 
+	requests chan *request.Request
+}
+
+func NewServer() *server{
+	return &server{
+		groups: make(map[string]*group),
+		clients: make([]*Client, 1),
+		requests: make(chan *request.Request, 50),
+	}
+}
+
+func (server *server) StartListening(){
 	go server.run()
 
 	listener, err := net.Listen("tcp4", ":"+strconv.Itoa(port))
@@ -27,51 +43,50 @@ func (server *server) startListening(){
 			fmt.Println("[#ERROR] Failed to accept connecton: " + err.Error())
 			continue
 		}
-		conn.Write([]byte("sa;am chaghalll =))\n"))
 		go server.newConn(conn)
 	}	
 }
 func (server *server) newConn(conn net.Conn){
-	newGuest := &client{
-		conn: conn,
-		username: "",
-		commands: server.commands , 
-		gp: nil,
-		targetClient: nil,
-		isLoggedIn: false,
-		isGuest: true,
-	}
 	fmt.Printf("[#] New connection. addr:%s\n", conn.RemoteAddr().String());
 
-	newGuest.sendMsg("[FROM SERVER] Please enter username")
-	newGuest.readInput()
+	newGuest := NewClient(conn)
+
+	t := types.ConnToUser
+	// fmt.Println(t)
+	msg := "**____*****salamamamamamam arrrrrrrrrrrrrrr"
+
+	req := request.NewReq(t, []byte(msg))
+
+	// newGuest.conn.Write([]byte(msg))
+	newGuest.send(*req)
+	// newGuest.readInput()
 }
 func (server *server) run(){
 	fmt.Println("[#] Listening to channel")
-	for cmd := range server.commands{
-		switch cmd.id{
-		case cmdChangeUsername:
-			server.changeUsername()
-		case cmdGetUsersList:
-			server.getUsersList(cmd)
-		case cmdConnToUser:
-			server.connectToUser(cmd)
-		case cmdConnToGp:
-			server.connectToGroup()
-		case cmdMsgToUser:
-			server.sendMessageToUser(cmd)
-		case cmdFileToUser:
-			server.sendFileToUser()
-		case cmdMsgToGp:
-			server.sendMessageToGroup()
-		case cmdFileToGp: 
-			server.sendFileToGroup()
-		case cmdQuit: 
-			server.quit()
-		default:
-			server.error()
-		}
-	}
+	// for cmd := range server.commands{
+	// 	switch cmd.id{
+	// 	case cmdChangeUsername:
+	// 		server.changeUsername()
+	// 	case cmdGetUsersList:
+	// 		server.getUsersList(cmd)
+	// 	case cmdConnToUser:
+	// 		server.connectToUser(cmd)
+	// 	case cmdConnToGp:
+	// 		server.connectToGroup()
+	// 	case cmdMsgToUser:
+	// 		server.sendMessageToUser(cmd)
+	// 	case cmdFileToUser:
+	// 		server.sendFileToUser()
+	// 	case cmdMsgToGp:
+	// 		server.sendMessageToGroup()
+	// 	case cmdFileToGp: 
+	// 		server.sendFileToGroup()
+	// 	case cmdQuit: 
+	// 		server.quit()
+	// 	default:
+	// 		server.error()
+	// 	}
+	// }
 }
 
 func (server *server) enterUsername(){
@@ -80,6 +95,7 @@ func (server *server) enterUsername(){
 func (server *server) changeUsername(){
 
 }
+/*
 func (server *server) getUsersList(cmd command){
 	var clients []string
 	
@@ -141,4 +157,4 @@ func (server *server) findClientByUsername(username string) *client {
 		}
 	}
 	return nil
-}
+}*/

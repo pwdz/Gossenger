@@ -2,97 +2,126 @@ package handler
 
 import(
 	"fmt"
-	"Gossenger/server/model"
+	"Gossenger/request"
+	"Gossenger/request/types"
+	"Gossenger/constants"
+	"bufio"
+	"net"
+	"Gossenger/pkg/utils"
+	"strings"
 )
 
+//Client struct
+type Client struct{
+	conn net.Conn
+	username string
+	
+	in chan<- *request.Request
+	out chan<- *request.Request
 
-func (client *client) sendMsg(input string){
-	fmt.Printf("[#] Sending message to: %s|Msg: %s\n", client.conn.RemoteAddr().String(), input)
-	client.conn.Write([]byte(input+"\n"))
+	reader *bufio.Reader
+
+	targetGp *group
+	targetClient *Client
+
+	isLoggedIn bool
+	isGuest bool
 }
-func (client *client) sendErr(err error) {
-	client.conn.Write([]byte("err: " + err.Error() + "\n"))
+
+//NewClient returns a new client struct
+func NewClient(conn net.Conn)*Client{
+	return &Client{
+		conn: conn,
+		username: "",
+		
+		in: make(chan *request.Request, 50),
+		out: make(chan *request.Request, 50),
+		
+		reader: bufio.NewReader(conn),
+
+		targetGp: nil,
+		targetClient: nil,
+
+		isLoggedIn: false,
+		isGuest: true,
+	}
 }
-func (client *client) readInput(){
+
+func (client *Client) send(req request.Request){
+	fmt.Printf("[#] Sending to: %s ...\n", client.conn.RemoteAddr().String())
+	
+	encodedData := utils.ToBase64(req)
+	encodedData = append(encodedData, constants.Delimiter)
+
+	bytesCount,err := client.conn.Write(encodedData)
+	if err != nil{
+		fmt.Println("[#ERROR] Failed to write data to socket")
+	}
+
+	fmt.Printf("[#] sent bytes count: %d\n", bytesCount)
+}
+func (client *Client) readInput(){
 	fmt.Printf("[#] Connection %s reading input...\n", client.conn.RemoteAddr().String())
 	for{
+		buffer, err := client.reader.ReadBytes(constants.Delimiter)
+		req := utils.FromBase64(buffer)
 
-		// client.conn.Read();
-		buffer, err := bufio.NewReader(client.conn).ReadBytes('\n')
-		input := string(buffer)
-		if err != nil{
-			return
+		if err != nil{	
+			fmt.Println("[#ERROR] Failed to read socket data:", err)
+			continue
 		}
-		fmt.Printf("[#] Input from user:%s\n", input)
-
-		input = strings.Trim(input,"\r\n")
-		args := strings.Split(input, " ")
-		cmd := strings.TrimSpace(args[0])
-		input = strings.Join(args[1:len(args)]," ")
-	
+		
 		if !client.isLoggedIn{
-			switch cmd{
-			case "/username":
-				client.checkUsername(input)
-			case "/password":
-				client.checkPassword(input)
+			switch req.ReqType{
+			case types.EnterUsername:
+				client.checkUsername(req.Data)
+			case types.Password:
+				client.checkPassword(req.Data)
 			}
 		}else{
-			switch cmd{
-			case "/changeusername":
+			switch req.ReqType{
+			case types.ChangeUsername:
+			case types.GetUsersList:
+			case types.ConnToUser:
+			case types.ConnToGp:
+			case types.MsgToUser:
+				// client.commands <- command{
+				// 	id: cmdMsgToUser,
+				// 	client: client,
+				// 	args: args,
+				// }
+			case types.FileToUser:
 
-			case "/getuserslist":
-				client.commands <- command{
-					id: cmdGetUsersList,
-					client: client,
-				}
-			case "/conntouser":
-				client.commands <- command{
-					id: cmdConnToUser,
-					client: client,
-					args: args,
-				}
+			case types.MsgToGp:
 
-			case "/conntogp":
+			case types.FileToGp:
 
-			case "/msgtouser":
-				client.commands <- command{
-					id: cmdMsgToUser,
-					client: client,
-					args: args,
-				}
-			case "/filetouser":
-
-			case "/msgtogp":
-
-			case "/filetogp":
-
-			case "/quit":
+			case types.Quit:
 			default:
-				client.sendErr(fmt.Errorf("[SERVER] Unkown command: %s", cmd))
 			}
 
 		}
 
 	}
 } 
-func (client *client) checkUsername(username string){
-	username = strings.TrimSpace(username)
+func (client *Client) checkUsername(data []byte){
+	username := string(data)
+	username = strings.Trim(username,"\n\r ")
 	//TODO
 	//TODO
 	//TODO
 	if false{//Username already exists
-		client.sendMsg("[SERVER] Please enter password")
+		// client.sendMsg("[SERVER] Please enter password")
 		client.isGuest = false;
 
 	}else{//New Username
 		client.isGuest = true;
 		client.username = username 
 		
-		client.sendMsg("[SERVER] Please choose a password")
+		// client.sendMsg("[SERVER] Please choose a password")
 	}
 }
-func (client *client) checkPassword(password string){
+func (client *Client) checkPassword(data []byte){
 	if client.isGuest{
 		//Guest choosed a password
 		client.isLoggedIn = true

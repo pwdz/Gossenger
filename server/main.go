@@ -3,12 +3,13 @@ package main
 import(
 	// "net"
 	// "fmt"
+	"Gossenger/server/handler"
 )
 
 func main()  {
 	
-	server := newServer()	
-	server.startListening()
+	server := handler.NewServer()	
+	server.StartListening()
 
 
 }
