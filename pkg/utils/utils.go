@@ -2,16 +2,16 @@ package utils
 
 import(
 	"fmt"	
-	"Gossenger/request"
+	"Gossenger/command"
 	"encoding/base64"
     "encoding/gob"
     "bytes"
 )
-//ToBase64 convert request to bytes
-func ToBase64(req request.Request) []byte {
+//ToBase64 convert structs to bytes
+func ToBase64(in interface{}) []byte {
     buff := bytes.Buffer{}
     encoder := gob.NewEncoder(&buff)
-    err := encoder.Encode(req)
+    err := encoder.Encode(in)
     if err != nil { 
 		fmt.Println(`failed gob Encode`, err) 
 	}
@@ -19,8 +19,8 @@ func ToBase64(req request.Request) []byte {
 }
 
 // FromBase64 to request struct
-func FromBase64(data []byte) request.Request {
-	req := request.Request{}
+func FromBase64(data []byte) command.Command {
+	req := command.Command{}
 	// var decodedBytes
     decodedBytes, err := base64.StdEncoding.DecodeString(string(data))
     if err != nil { 

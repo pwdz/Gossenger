@@ -6,6 +6,7 @@ import(
 	"bufio"
 	"Gossenger/constants"
 	"Gossenger/pkg/utils"
+	"strconv"
 )
 
 type client struct{
@@ -19,7 +20,7 @@ func newClient() *client{
 }
 
 func (client *client) connect(){
-	addr := ":" + string(constants.Port)
+	addr := ":" + strconv.Itoa(constants.Port)
 	fmt.Printf("[$] Connecting to host %s ...\n", addr)
 	conn, err := net.Dial(constants.ConnType, addr)
 
@@ -51,9 +52,9 @@ func (client *client) readInput(){//from server
 
 		}
 
-		req := utils.FromBase64(input)
-		fmt.Println("type:", req.ReqType)
-		fmt.Println("msg:", string(req.Data))
+		cmd := utils.FromBase64(input)
+		fmt.Println("type:", cmd.CmdType)
+		fmt.Println("msg:", string(cmd.Data))
 
 	}
 }

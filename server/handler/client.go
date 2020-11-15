@@ -2,8 +2,8 @@ package handler
 
 import(
 	"fmt"
-	"Gossenger/request"
-	"Gossenger/request/types"
+	"Gossenger/command"
+	"Gossenger/command/types"
 	"Gossenger/constants"
 	"bufio"
 	"net"
@@ -16,8 +16,8 @@ type Client struct{
 	conn net.Conn
 	username string
 	
-	in chan<- *request.Request
-	out chan<- *request.Request
+	in chan<- *command.Command
+	out chan<- *command.Command
 
 	reader *bufio.Reader
 
@@ -34,8 +34,8 @@ func NewClient(conn net.Conn)*Client{
 		conn: conn,
 		username: "",
 		
-		in: make(chan *request.Request, 50),
-		out: make(chan *request.Request, 50),
+		in: make(chan *command.Command, 50),
+		out: make(chan *command.Command, 50),
 		
 		reader: bufio.NewReader(conn),
 
@@ -47,10 +47,10 @@ func NewClient(conn net.Conn)*Client{
 	}
 }
 
-func (client *Client) send(req request.Request){
+func (client *Client) send(cmd command.Command){
 	fmt.Printf("[#] Sending to: %s ...\n", client.conn.RemoteAddr().String())
 	
-	encodedData := utils.ToBase64(req)
+	encodedData := utils.ToBase64(cmd)
 	encodedData = append(encodedData, constants.Delimiter)
 
 	bytesCount,err := client.conn.Write(encodedData)
@@ -64,7 +64,7 @@ func (client *Client) readInput(){
 	fmt.Printf("[#] Connection %s reading input...\n", client.conn.RemoteAddr().String())
 	for{
 		buffer, err := client.reader.ReadBytes(constants.Delimiter)
-		req := utils.FromBase64(buffer)
+		cmd := utils.FromBase64(buffer)
 
 		if err != nil{	
 			fmt.Println("[#ERROR] Failed to read socket data:", err)
@@ -72,14 +72,14 @@ func (client *Client) readInput(){
 		}
 		
 		if !client.isLoggedIn{
-			switch req.ReqType{
+			switch cmd.CmdType{
 			case types.EnterUsername:
-				client.checkUsername(req.Data)
+				client.checkUsername(cmd.Data)
 			case types.Password:
-				client.checkPassword(req.Data)
+				client.checkPassword(cmd.Data)
 			}
 		}else{
-			switch req.ReqType{
+			switch cmd.CmdType{
 			case types.ChangeUsername:
 			case types.GetUsersList:
 			case types.ConnToUser:

@@ -8,12 +8,18 @@ const(
 	EnterUsername TypeID = iota 
 	Password
 	ChangeUsername
+
+	NewUserJoined
+	Quit 
+
 	GetUsersList
 	ConnToUser
-	ConnToGp
 	MsgToUser
 	FileToUser
+
+	CreateGp
+	AddMember
+	ConnToGp
 	MsgToGp
 	FileToGp 
-	Quit 
 )

@@ -5,8 +5,8 @@ import(
 	"net"
 	"strconv"
 	// "strings"
-	"Gossenger/request"
-	"Gossenger/request/types"
+	"Gossenger/command"
+	"Gossenger/command/types"
 )
 const(
 	port = 9000
@@ -15,14 +15,14 @@ const(
 type server struct{
 	groups map[string]*group 
 	clients []*Client 
-	requests chan *request.Request
+	requests chan *command.Command
 }
 
 func NewServer() *server{
 	return &server{
 		groups: make(map[string]*group),
 		clients: make([]*Client, 1),
-		requests: make(chan *request.Request, 50),
+		requests: make(chan *command.Command, 50),
 	}
 }
 
@@ -55,7 +55,7 @@ func (server *server) newConn(conn net.Conn){
 	// fmt.Println(t)
 	msg := "**____*****salamamamamamam arrrrrrrrrrrrrrr"
 
-	req := request.NewReq(t, []byte(msg))
+	req := command.NewCommand(t, []byte(msg), "SERVER", newGuest.username)
 
 	// newGuest.conn.Write([]byte(msg))
 	newGuest.send(*req)
