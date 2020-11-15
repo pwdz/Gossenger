@@ -1,11 +1,10 @@
 package main
 
+import(
+	// "fmt"
+)
 		
 func main()  {
-	
 	client := newClient()
-	client.connect(":9000")
-
-		
-
+	client.connect()
 }	
