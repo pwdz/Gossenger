@@ -6,7 +6,12 @@ type TypeID int
 const(
 	//Request types
 	EnterUsername TypeID = iota 
+	UsernameSuccess
+
 	Password
+	RegisterSuccess
+	LoginSuccess
+
 	ChangeUsername
 
 	NewUserJoined
@@ -14,12 +19,26 @@ const(
 
 	GetUsersList
 	ConnToUser
-	MsgToUser
-	FileToUser
+	// MsgToUser
+	// FileToUser
 
 	CreateGp
 	AddMember
 	ConnToGp
-	MsgToGp
-	FileToGp 
+	// MsgToGp
+	// FileToGp 
+
+	Msg
+	File
 )
+
+// var CommandsList []string{"List of available command",
+// 						 "/chusername",
+// 						 "/getusers",
+// 						 "/connuser",
+// 						 "/creategp",
+// 						 "/conngp",
+// 						 "/addmember",
+// 						 "/msg",
+// 						 "/file",
+// 						 "/quit"}

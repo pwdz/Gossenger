@@ -9,4 +9,6 @@ const(
 	ConnType string = "tcp4"
 	//MaxStreamSize the maximum allowed stream size 
 	MaxStreamSize int = 1024
+	//ServerName ...
+	ServerName string = "SERVER"
 )

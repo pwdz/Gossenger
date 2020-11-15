@@ -6,7 +6,7 @@ import(
 	"strconv"
 	// "strings"
 	"Gossenger/command"
-	"Gossenger/command/types"
+	// "Gossenger/command/types"
 )
 const(
 	port = 9000
@@ -51,15 +51,8 @@ func (server *server) newConn(conn net.Conn){
 
 	newGuest := NewClient(conn)
 
-	t := types.ConnToUser
-	// fmt.Println(t)
-	msg := "**____*****salamamamamamam arrrrrrrrrrrrrrr"
-
-	req := command.NewCommand(t, []byte(msg), "SERVER", newGuest.username)
-
-	// newGuest.conn.Write([]byte(msg))
-	newGuest.send(*req)
-	// newGuest.readInput()
+	newGuest.greetings()
+	go newGuest.readInput()
 }
 func (server *server) run(){
 	fmt.Println("[#] Listening to channel")
