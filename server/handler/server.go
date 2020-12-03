@@ -13,21 +13,21 @@ const(
 )
 
 type server struct{
-	groups map[string]*group 
-	clients []*Client 
-	requests chan *command.Command
+	groups map[string]*group //gpName, group struct
+	clients map[string]*Client//clientName,Client struct 
+	commands chan *command.Command
 }
 
 func NewServer() *server{
 	return &server{
 		groups: make(map[string]*group),
-		clients: make([]*Client, 1),
-		requests: make(chan *command.Command, 50),
+		clients: make(map[string]*Client),
+		commands: make(chan *command.Command, 50),
 	}
 }
 
 func (server *server) StartListening(){
-	go server.run()
+	// go server.run()
 
 	listener, err := net.Listen("tcp4", ":"+strconv.Itoa(port))
 	if err != nil{
@@ -49,105 +49,40 @@ func (server *server) StartListening(){
 func (server *server) newConn(conn net.Conn){
 	fmt.Printf("[#] New connection. addr:%s\n", conn.RemoteAddr().String());
 
-	newGuest := NewClient(conn)
+	newGuest := NewClient(conn, server.commands)
 
 	newGuest.greetings()
 	go newGuest.readInput()
+	go newGuest.listen(server)
+	go newGuest.startWriteChannel()
 }
-func (server *server) run(){
-	fmt.Println("[#] Listening to channel")
-	// for cmd := range server.commands{
-	// 	switch cmd.id{
-	// 	case cmdChangeUsername:
-	// 		server.changeUsername()
-	// 	case cmdGetUsersList:
-	// 		server.getUsersList(cmd)
-	// 	case cmdConnToUser:
-	// 		server.connectToUser(cmd)
-	// 	case cmdConnToGp:
-	// 		server.connectToGroup()
-	// 	case cmdMsgToUser:
-	// 		server.sendMessageToUser(cmd)
-	// 	case cmdFileToUser:
-	// 		server.sendFileToUser()
-	// 	case cmdMsgToGp:
-	// 		server.sendMessageToGroup()
-	// 	case cmdFileToGp: 
-	// 		server.sendFileToGroup()
-	// 	case cmdQuit: 
-	// 		server.quit()
-	// 	default:
-	// 		server.error()
-	// 	}
-	// }
-}
+// func (server *server) run(){
+// 	fmt.Println("[#] Listening to channel")
+// 	for cmd := range server.commands{
+// 		switch cmd.CmdType{
+// 		case types.EnterUsername:
+// 			// server.checkUsername(*cmd)
+// 		case types.Password:
+// 			// server.checkPassword(*cmd)
+// 		case types.ChangeUsername:
+// 			// server.connectToUser(cmd)
+// 		case types.GetUsersList:
+// 			// server.connectToGroup()
+// 		case types.ConnToUser:
+// 			// server.sendMessageToUser(cmd)
+// 		case types.ConnToGp:
+// 			// server.sendFileToUser()
+// 		case types.CreateGp:
+// 			// server.sendMessageToGroup()
+// 		case types.AddMember: 
+// 			// server.sendFileToGroup()
+// 		case types.MsgTo: 
+// 			// server.quit()
+// 		case types.FileTo: 
+// 		case types.Quit:
+// 		default:
+// 			// server.error()
+// 		}
+// 	}
+// }
 
-func (server *server) enterUsername(){
-
-}
-func (server *server) changeUsername(){
-
-}
-/*
-func (server *server) getUsersList(cmd command){
-	var clients []string
-	
-	for _, client := range server.clients{
-		clients = append(clients, client.username)
-	}
-
-	cmd.client.sendMsg(fmt.Sprintf("[FROM SERVER] Online users:\n %s", strings.Join(clients, "\n")))
-}
-func (server *server) connectToUser(cmd command){
-	
-	targetUsername := strings.Join(cmd.args[1:len(cmd.args)], " ")
-	targetUsername = strings.TrimSpace(targetUsername)
-
-	targetClient := server.findClientByUsername(targetUsername)
-
-	if targetClient != nil{
-		cmd.client.targetClient = targetClient
-		cmd.client.sendMsg("[FROM SERVER] connected to " + targetUsername)
-	}else{
-		cmd.client.sendErr(fmt.Errorf("[FROM SERVER] Not a valid username: %s", targetUsername))
-	}	
-
-}
-func (server *server) connectToGroup(){
-
-}
-func (server *server) sendMessageToUser(cmd command){
-	if cmd.client.targetClient != nil{
-
-		msg := strings.Join(cmd.args[1:len(cmd.args)], " ")
-		msg = strings.TrimSpace(msg)
-
-		cmd.client.targetClient.sendMsg(cmd.client.username+": " +msg)
-
-	}else{
-		cmd.client.sendErr(fmt.Errorf("[FROM SERVER] there is no connection to any user"))
-	}
-}
-func (server *server) sendFileToUser(){
-
-}
-func (server *server) sendMessageToGroup(){
-
-}
-func (server *server) sendFileToGroup(){
-	
-}
-func (server *server) quit(){
-
-}
-func (server *server) error(){
-
-}
-func (server *server) findClientByUsername(username string) *client {
-	for _, client := range server.clients{
-		if client.username == username{
-			return client
-		}
-	}
-	return nil
-}*/

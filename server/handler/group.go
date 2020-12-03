@@ -1,19 +1,17 @@
 package handler
 
+import(
+	"Gossenger/command"
+)
 
 type group struct{
 	name string
-	// members map[net.Addr]*client //addr, clientObj
+	members []*Client //addr, clientObj
 }
-func (gp *group) publishMsg(sender *Client, msg string){
-	// for addr,client := range gp.members{
-	// 	if sender.conn.RemoteAddr() != addr{
-	// 		client.sendMsg(msg)
-	// 	}
-	// }
-}
-
-//TODO
-func (gp *group) publishFile(){
-
+func (gp *group) publish(sender *Client, cmd *command.Command){
+	for _,client := range gp.members{
+		if sender.username != client.username{
+			client.send(cmd)
+		}
+	}
 }
