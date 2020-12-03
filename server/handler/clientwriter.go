@@ -27,6 +27,19 @@ func (client *Client) startWriteChannel(){
 }
 
 func (client *Client) send(cmd *command.Command){
+		// fmt.Printf("[#] Sending to: %s ...\n", client.conn.RemoteAddr().String())
+	
+		// encodedData := utils.ToBase64(*cmd)
+		// encodedData = append(encodedData, constants.Delimiter)
+
+		// bytesCount,err := client.conn.Write(encodedData)
+		// if err != nil{
+		// 	fmt.Println("[#ERROR] Failed to write data to socket")
+		// }
+
+		// fmt.Printf("[#] sent bytes count: %d\n", bytesCount)
+
+
 	client.out <- cmd;
 }
 func (client *Client) sendErr(err error){

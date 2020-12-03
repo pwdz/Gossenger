@@ -49,11 +49,11 @@ func (server *server) StartListening(){
 func (server *server) newConn(conn net.Conn){
 	fmt.Printf("[#] New connection. addr:%s\n", conn.RemoteAddr().String());
 
-	newGuest := NewClient(conn, server.commands)
+	newGuest := NewClient(conn)
 
 	newGuest.greetings()
 	go newGuest.readInput()
-	go newGuest.listen(server)
+	go newGuest.startListenChannel(server)
 	go newGuest.startWriteChannel()
 }
 // func (server *server) run(){

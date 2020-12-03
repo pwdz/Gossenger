@@ -5,7 +5,7 @@ import(
 	"net"
 	"bufio"
 	"Gossenger/constants"
-	"Gossenger/pkg/utils"
+	"Gossenger/utils"
 	"strconv"
 	"strings"
 	"os"
@@ -53,10 +53,25 @@ func (client *client) readInput(){//from server
 
 		cmd := utils.FromBase64(input[0:len(input)-1])
 		// fmt.Println("type:", cmd.CmdType)
-		fmt.Println(string(cmd.Data))
+		fmt.Println(string(cmd.Data), cmd.CmdType)
+		switch cmd.CmdType{
+		case types.RegisterSuccess:
+			client.usernameSuccess(cmd)
+		case types.LoginSuccess:
+			client.usernameSuccess(cmd)
+		}
+
 
 	}
 }
+func (client *client) usernameSuccess(cmd command.Command){
+	client.username = string(cmd.Data)
+	fmt.Println("[*] username set successfully: ", client.username)
+}
+
+
+
+
 func (client *client) runConsole(){
 	fmt.Println("[$] Starting Console...")
 	// input := ""
@@ -77,6 +92,12 @@ func (client *client) runConsole(){
 			client.sendUsername(input)
 		case "/password":
 			client.sendPassword(input)
+		case "/connect":
+			client.connectToChat(input)
+		case "/send":
+			client.sendMsg(input)
+		case "/file":
+			client.sendFile(input)
 		}
 		
 		// input =""
@@ -103,4 +124,16 @@ func (client *client) sendUsername(username string){
 func (client *client) sendPassword(password string){
 	cmd := command.NewCommand(types.Password, []byte(password), client.username, constants.ServerName)
 	client.send(*cmd)
+}
+func (client *client) connectToChat(chatID string){
+	cmd := command.NewCommand(types.Connect, []byte(chatID), client.username, constants.ServerName)
+	client.send(*cmd)
+}
+func (client *client) sendMsg(message string){
+	cmd := command.NewCommand(types.MsgTo, []byte(message), client.username, constants.ServerName)
+	client.send(*cmd)
+
+}	
+func (client *client) sendFile(path string){
+	
 }

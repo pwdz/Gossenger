@@ -7,10 +7,10 @@ import(
 	"fmt"
 )
 
-func (client *Client) listen(server *server){
+func (client *Client) startListenChannel(server *server){
 	fmt.Println("[#] Listening to channel")
 	for cmd := range client.in{
-		fmt.Printf("[#] Command in listener for client %s\n", client.username)
+		fmt.Printf("[#] Command in listener for client %s\n", client.conn.RemoteAddr())
 		switch cmd.CmdType{
 		case types.EnterUsername:
 			server.checkUsername(*cmd, client)
@@ -20,9 +20,9 @@ func (client *Client) listen(server *server){
 			// server.connectToUser(cmd)
 		case types.GetUsersList:
 			// server.connectToGroup()
-		case types.ConnToUser:
-			// server.sendMessageToUser(cmd)
-		case types.ConnToGp:
+		case types.Connect:
+			server.connectTo(*cmd)
+		// case types.ConnToGp:
 			// server.sendFileToUser()
 		case types.CreateGp:
 			// server.sendMessageToGroup()
@@ -63,17 +63,26 @@ func (server *server) changeUsername(cmd command.Command){
 func (server *server) sendMsg(cmd *command.Command){
 	sender, okSender := server.clients[cmd.From]
 	if okSender{
-		client, okReceiver := server.clients[cmd.To]
-		if okReceiver{
-			client.send(cmd)	
+
+		fmt.Println("[#] sending msg to", sender.targetChatID, sender.isTargetGp)
+		if !sender.isTargetGp{
+
+			receiver, okReceiver := server.clients[sender.targetChatID]
+			if okReceiver{
+				receiver.send(cmd)	
+			}else{
+
+			}
+
 		}else{
-			group, ok := server.groups[cmd.To]
+			group, ok := server.groups[sender.targetChatID]
 			if ok{
 				group.publish(sender, cmd)
 			}else{
 				//ridiiiiii!
 			}
 		}
+
 	}else{
 
 	}
@@ -84,11 +93,25 @@ func (server *server) sendMsg(cmd *command.Command){
 func (server *server) getUsersList(cmd command.Command){
 
 }
-func (server *server) connectToUser(cmd command.Command){
+func (server *server) connectTo(cmd command.Command){
+	client, ok := server.clients[cmd.From]
+	if !ok{
+		fmt.Println("kiriiiiiiii", cmd.From)
+		return
+	}	
+	targetChatID := string(cmd.Data)
+	targetChatID = strings.Trim(targetChatID,"\n\r ")
 
-}
-func (server *server) connectToGroup(cmd command.Command){
 
+	_, okClient := server.clients[targetChatID]
+	_, okGroup := server.groups[targetChatID]
+	if okClient || okGroup{
+		fmt.Println("=>>>>>>>>."+targetChatID)
+		client.targetChatID = targetChatID
+		client.isTargetGp = okGroup	
+	}else{
+		//ridi no chat!
+	}
 }
 func (server *server) quit(){
 

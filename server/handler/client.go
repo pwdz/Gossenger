@@ -29,12 +29,12 @@ type Client struct{
 }
 
 //NewClient returns a new client struct
-func NewClient(conn net.Conn, commands chan *command.Command)*Client{
+func NewClient(conn net.Conn)*Client{
 	return &Client{
 		conn: conn,
 		username: "",
 		
-		in: commands,
+		in: make(chan *command.Command, 50),
 		out: make(chan *command.Command, 50),
 		
 		reader: bufio.NewReader(conn),

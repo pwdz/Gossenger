@@ -11,7 +11,7 @@ import(
 )
 
 func (server *server) checkUsername(cmd command.Command, client *Client){
-	fmt.Println("[#] Checking username...")
+	fmt.Printf("[#] Checking username... [Conn: %s]", client.conn.RemoteAddr())
 
 	username := string(cmd.Data)
 	username = strings.Trim(username,"\n\r ")
@@ -46,7 +46,7 @@ func (server *server) checkPassword(cmd command.Command, client *Client){
 		client.isGuest = false
 		
 		respCmd.CmdType = types.RegisterSuccess
-		respCmd.Data = []byte("Registeration Completed! wlc " + client.username + " :))")
+		respCmd.Data = []byte(client.username)
 
 		//Save username and password		
 		server.loginSuccess(client)
@@ -55,13 +55,13 @@ func (server *server) checkPassword(cmd command.Command, client *Client){
 		//Send the proper message
 		if password == "1234"{
 			respCmd.CmdType = types.LoginSuccess
-			respCmd.Data = []byte("Login Completed! wlc "+ client.username +" :))")
+			respCmd.Data = []byte(client.username)
 			
 			server.loginSuccess(client)
 
 		}else{
 			respCmd.CmdType = types.Failure
-			respCmd.Data = []byte("Wrong Password!")
+			respCmd.Data = []byte("")
 		
 		}
 	}
@@ -69,5 +69,8 @@ func (server *server) checkPassword(cmd command.Command, client *Client){
 	client.send(respCmd)
 }
 func (server *server) loginSuccess(client *Client){
+	fmt.Println(":||||||||||||||||||||||||||||||||||,",len(server.clients))
 	server.clients[client.username] = client
+
+	fmt.Println(":||||||||after,",len(server.clients))
 }
