@@ -19,7 +19,7 @@ Currently Supported Commands:
 - **/send [message]**
 - **/file [path]**
 - **/creategp [gpName]** (Default Admin: Group creator) 
-- **/addmembers [UserID1] [UserID2] ...**
+- **/addmembers [UserID1] [UserID2] ...** (Permission: Group Member)
 - **/removemembers [UserID1] [UserID2] ...** (Permission: Group Admin)
   
 TODO:  
