@@ -69,5 +69,8 @@ func (server *server) checkPassword(cmd command.Command, client *Client){
 	client.send(respCmd)
 }
 func (server *server) loginSuccess(client *Client){
+	for _,user := range server.clients{
+		user.sendMsg(client.username+" Joined the server!")
+	}
 	server.clients[client.username] = client
 }

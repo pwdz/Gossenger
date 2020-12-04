@@ -136,4 +136,8 @@ func (server *server) sendUsersList(cmd command.Command){
 func (server *server) quitClient(cmd command.Command){
 	delete(server.clients, cmd.From)
 	fmt.Println("[#] client",cmd.From,"left!")
+	for _,user := range server.clients{
+		user.sendMsg(cmd.From+" left the server!")
+	}
+
 }
