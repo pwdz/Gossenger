@@ -26,9 +26,11 @@ func (client *Client) startListenChannel(server *server){
 		// case types.ConnToGp:
 			// server.sendFileToUser()
 		case types.CreateGp:
-			// server.sendMessageToGroup()
-		case types.AddMember: 
-			// server.sendFileToGroup()
+			server.createGp(*cmd)
+		case types.AddMembers: 
+			server.addClientsToGp(*cmd)
+		case types.RemoveMembers: 
+			server.removeClientsFromGp(*cmd)
 		case types.MsgTo: 
 			server.sendMsg(cmd)
 			// server.quit()
@@ -139,5 +141,87 @@ func (server *server) quitClient(cmd command.Command){
 	for _,user := range server.clients{
 		user.sendMsg(cmd.From+" left the server!")
 	}
+
+}
+func (server *server)createGp(cmd command.Command){
+	gpName := string(cmd.Data)
+
+	client, ok := server.clients[cmd.From]
+	if !ok{
+		fmt.Println("[#ERROR] sender 404", cmd.From)
+		return
+	}
+	if _, ok := server.groups[gpName]; !ok{
+		//not a duplicate gp name
+		newGroup := NewGroup(gpName, cmd.From)
+		newGroup.addMembers(client,client)
+		server.groups[gpName] = newGroup 
+		fmt.Println("[#] Group",gpName,"Created by",cmd.From,".")
+		client.sendMsg("Group "+gpName+" created.")		
+	}else{
+		//ridi duplicate
+
+		client.sendMsg("[ERROR] A group with this name already exist!")
+	}
+}
+func (server *server) addClientsToGp(cmd command.Command){
+	input := string(cmd.Data)
+	members := strings.Split(input," ")
+	gpName := members[0]
+	members = members[1:]
+
+	client, ok := server.clients[cmd.From]
+	if !ok{
+		fmt.Println("[#ERROR] sender 404", cmd.From)
+		return
+	}
+	if group, ok := server.groups[gpName]; ok{
+		if group.isMember(client.username){
+			//we can add
+			toBeAddedClients := make([]*Client,0)
+			for _,username := range members{
+				user, ok1 := server.clients[username]
+				if !ok1{
+					client.sendMsg("[#ERROR] user "+username+" doesn't exist")
+					// return
+				}else{
+					toBeAddedClients = append(toBeAddedClients, user)
+				}
+			}
+			group.addMembers(client, toBeAddedClients...)
+
+		}else{
+			client.sendMsg("[#ERROR] You are not a member of this group")
+		}
+	}else{
+		client.sendMsg("[#ERROR] such a group doesn't exist")
+	}
+
+}
+func (server *server) removeClientsFromGp(cmd command.Command){
+	//Only if admin!
+	client, ok := server.clients[cmd.From]
+	if !ok{
+		fmt.Println("[#ERROR] sender 404", cmd.From)
+		return
+	}
+
+	input := string(cmd.Data)
+	members := strings.Split(input," ")
+	gpName := members[0]
+	members = members[1:]
+
+	if group, ok := server.groups[gpName]; ok{
+		if group.isAdmin(client.username){
+			//we can remove
+			group.removeMembers(client, members...)
+		}else{
+			client.sendMsg("[#ERROR] You are not the ADMIN of this group")
+		}
+	}else{
+		client.sendMsg("[#ERROR] such a group doesn't exist")
+	}
+
+
 
 }

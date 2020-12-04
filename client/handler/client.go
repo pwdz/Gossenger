@@ -80,7 +80,12 @@ func (client *client) runConsole(){
 			client.sendFile(input)	
 		case "/getusers":
 			client.getUsers()
-		
+		case "/creategp":
+			client.createGp(input)
+		case "/addmembers":
+			client.addMembers(input)
+		case "/removemembers":
+			client.removeMembers(input)
 		}
 		
 		// input =""
@@ -137,5 +142,19 @@ func (client *client) sendFile(path string){
 }
 func (client *client) getUsers(){
 	cmd := command.NewCommand(types.GetUsersList, []byte{}, client.username, constants.ServerName)
+	client.send(*cmd)
+}
+func (client *client) createGp(gpName string){
+
+	cmd := command.NewCommand(types.CreateGp, []byte(gpName), client.username, constants.ServerName)
+	client.send(*cmd)
+	
+}
+func (client *client) addMembers(members string){
+	cmd := command.NewCommand(types.AddMembers, []byte(members), client.username, constants.ServerName)
+	client.send(*cmd)
+}
+func (client *client) removeMembers(members string){
+	cmd := command.NewCommand(types.RemoveMembers, []byte(members), client.username, constants.ServerName)
 	client.send(*cmd)
 }
