@@ -11,7 +11,7 @@ import(
 func (client *Client) startWriteChannel(){
 
 	for cmd := range client.out {
-		fmt.Printf("[#] Sending to: %s ...\n", client.conn.RemoteAddr().String())
+		// fmt.Printf("[#] Sending to: %s ...\n", client.conn.RemoteAddr().String())
 	
 		encodedData := utils.ToBase64(*cmd)
 		encodedData = append(encodedData, constants.Delimiter)
@@ -21,7 +21,12 @@ func (client *Client) startWriteChannel(){
 			fmt.Println("[#ERROR] Failed to write data to socket")
 		}
 
-		fmt.Printf("[#] sent bytes count: %d\n", bytesCount)
+		fmt.Printf("[#] sent bytes count: %d %d<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n", bytesCount,len(encodedData))
+		if bytesCount != len(encodedData) {
+			fmt.Println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+		}
+
+		
 
 	}
 }

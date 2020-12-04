@@ -34,8 +34,8 @@ func NewClient(conn net.Conn)*Client{
 		conn: conn,
 		username: "",
 		
-		in: make(chan *command.Command, 50),
-		out: make(chan *command.Command, 50),
+		in: make(chan *command.Command, 500),
+		out: make(chan *command.Command, 500),
 		
 		reader: bufio.NewReader(conn),
 

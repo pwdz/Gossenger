@@ -10,7 +10,7 @@ import(
 func (client *Client) startListenChannel(server *server){
 	fmt.Println("[#] Listening to channel")
 	for cmd := range client.in{
-		fmt.Printf("[#] Command in listener for client %s\n", client.conn.RemoteAddr())
+		// fmt.Printf("[#] Command in listener for client %s\n", client.conn.RemoteAddr())
 		switch cmd.CmdType{
 		case types.EnterUsername:
 			server.checkUsername(*cmd, client)
@@ -32,6 +32,8 @@ func (client *Client) startListenChannel(server *server){
 			server.sendMsg(cmd)
 			// server.quit()
 		case types.FileTo: 
+			// server.sendFle()
+			server.sendMsg(cmd)
 		case types.Quit:
 		default:
 			// server.error()
@@ -64,7 +66,7 @@ func (server *server) sendMsg(cmd *command.Command){
 	sender, okSender := server.clients[cmd.From]
 	if okSender{
 
-		fmt.Println("[#] sending msg to", sender.targetChatID, sender.isTargetGp)
+		// fmt.Println("[#] sending msg to", sender.targetChatID, sender.isTargetGp)
 		if !sender.isTargetGp{
 
 			receiver, okReceiver := server.clients[sender.targetChatID]
@@ -79,7 +81,7 @@ func (server *server) sendMsg(cmd *command.Command){
 			if ok{
 				group.publish(sender, cmd)
 			}else{
-				//ridiiiiii!
+				//
 			}
 		}
 

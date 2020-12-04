@@ -25,7 +25,7 @@ func (client *Client) readInput(){
 		}
 
 		cmd := utils.FromBase64(buffer[0:len(buffer)-1])
-		fmt.Println("[#] Message Received from "+cmd.From+" ",cmd.CmdType)
+		fmt.Println("[#] Message Received from "+cmd.From+" ",cmd.CmdType,"size:",len(buffer),"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 		
 		if !client.isLoggedIn{
 			if cmd.CmdType == types.EnterUsername || cmd.CmdType == types.Password{
