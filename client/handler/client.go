@@ -1,4 +1,4 @@
-package main
+package handler
 
 import(
 	"fmt"
@@ -11,21 +11,24 @@ import(
 	"os"
 	"Gossenger/command"
 	"Gossenger/command/types"
+	"math"
 )
 
 type client struct{
 	conn net.Conn
 	username string
+	in chan []byte
 }
 
-func newClient() *client{
+func NewClient() *client{
 	return &client{
 		conn: nil,
 		username: "",
+		in: make(chan []byte, 500),
 	}
 }
 
-func (client *client) connect(){
+func (client *client) Connect(){
 	addr := ":" + strconv.Itoa(constants.Port)
 	fmt.Printf("[$] Connecting to host %s ...\n", addr)
 	conn, err := net.Dial(constants.ConnType, addr)
@@ -38,36 +41,11 @@ func (client *client) connect(){
 	client.conn = conn
 
 	go client.readInput()
+	go client.startReadChannel()
 	client.runConsole()
 }
 
-func (client *client) readInput(){//from server
-	fmt.Println("[$] Listening to server...")
-	for true{
 
-		input, err := bufio.NewReader(client.conn).ReadBytes(constants.Delimiter)
-
-		if err != nil{
-
-		}
-
-		cmd := utils.FromBase64(input[0:len(input)-1])
-		// fmt.Println("type:", cmd.CmdType)
-		fmt.Println(string(cmd.Data), cmd.CmdType)
-		switch cmd.CmdType{
-		case types.RegisterSuccess:
-			client.usernameSuccess(cmd)
-		case types.LoginSuccess:
-			client.usernameSuccess(cmd)
-		}
-
-
-	}
-}
-func (client *client) usernameSuccess(cmd command.Command){
-	client.username = string(cmd.Data)
-	fmt.Println("[*] username set successfully: ", client.username)
-}
 
 
 
@@ -97,7 +75,7 @@ func (client *client) runConsole(){
 		case "/send":
 			client.sendMsg(input)
 		case "/file":
-			client.sendFile(input)
+			client.sendFile(input)	
 		}
 		
 		// input =""
@@ -135,5 +113,30 @@ func (client *client) sendMsg(message string){
 
 }	
 func (client *client) sendFile(path string){
-	
+	data, err := ReadFile(path)
+	if err != nil {
+		fmt.Println("file read riiiiiiiid", err.Error())
+		return
+	}
+
+	fileLength := len(data)
+	var packetsCount int = int(math.Ceil(float64(fileLength)/float64(constants.MaxStreamSize)))
+	var packetSize int = constants.MaxStreamSize
+	for i := 0; i < packetsCount; i++ {
+		fmt.Println("[*][FILE] sending packet",i)
+		beginIndex := i*packetSize
+		
+		var endIndex int
+		if fileLength <= (i+1)*packetSize{
+			 endIndex = fileLength
+		}else{
+			 endIndex = (i+1)*packetSize
+		}
+		
+		cmd := command.NewCommand(types.FileTo, data[beginIndex:endIndex], client.username, constants.ServerName)
+		cmd.FollowPackets = packetsCount - 1 - i
+		client.send(*cmd)
+	}
+
+
 }
