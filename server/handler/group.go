@@ -17,8 +17,10 @@ func NewGroup(gpName,adminName string)*group{
 	}
 }
 func (gp *group) publish(sender *Client, cmd *command.Command){
+	cmd.From = gp.name + ":" + sender.username
 	for _,client := range gp.members{
 		if sender.username != client.username{
+			// cmd.From = gp.name +":"+ cmd.From
 			client.send(cmd)
 		}
 	}

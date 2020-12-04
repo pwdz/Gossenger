@@ -9,6 +9,7 @@ import(
 	"Gossenger/constants"
 	"io/ioutil"
 	"strings"
+	"os"
 )
 
 func (client *client) readInput(){//from server
@@ -27,12 +28,14 @@ func (client *client) readInput(){//from server
 func (client *client) startReadChannel(){
 	for inputBytes := range client.in{
 		cmd := utils.FromBase64(inputBytes[0:len(inputBytes)-1])
-
-		fmt.Println("[",len(inputBytes) ,"] type:", cmd.CmdType)
 		
 		switch cmd.CmdType{
-		case types.EnterUsername, types.ServerMsg, types.MsgTo:
-			fmt.Println(string(cmd.Data))
+		case types.EnterUsername: 
+			client.receiveEnterUsername(cmd)
+		case types.ServerMsg: 
+			client.receiveServerMsg(cmd)
+		case types.MsgTo:
+			client.receiveMsgTo(cmd)
 		case types.RegisterSuccess:
 			client.usernameSuccess(cmd)
 		case types.LoginSuccess:
@@ -47,16 +50,34 @@ func (client *client) startReadChannel(){
 }
 
 
+func (client *client) receiveEnterUsername(cmd command.Command){
+	fmt.Println("["+cmd.From+"] "+string(cmd.Data))
+}
+func (client *client) receiveServerMsg(cmd command.Command){
+
+	fmt.Println("["+cmd.From+"] "+string(cmd.Data))
+}
+func (client *client) receiveMsgTo(cmd command.Command){
+
+	fmt.Println("["+cmd.From+"] "+string(cmd.Data))
+}
 
 
 
 func (client *client) usernameSuccess(cmd command.Command){
 	client.username = string(cmd.Data)
-	fmt.Println("[*] username set successfully: ", client.username)
+	fmt.Println("["+cmd.From+"] username set successfully: "+client.username)
 }
 
 func (client *client) receiveFile(cmd command.Command){
-	err := ioutil.WriteFile("/home/pwdz/cache/"+cmd.Filename, cmd.Data, 0666)
+	fmt.Println("["+cmd.From+"] file>> "+ cmd.Filename)
+
+	dirPath := constants.BasePath + client.username
+	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
+		os.MkdirAll(dirPath, 0755)
+	}
+	
+	err := ioutil.WriteFile(dirPath+"/"+cmd.Filename, cmd.Data, 0666)
 	if err != nil { 
 		// handle error
 		fmt.Println(err.Error())
@@ -64,12 +85,10 @@ func (client *client) receiveFile(cmd command.Command){
 
 }
 func (client *client) receiveUsersList(cmd command.Command){
-	fmt.Println("kioni",string(cmd.Data))
 	clientNames := string(cmd.Data)
 	for index,username := range strings.Split(clientNames,"\n"){
 		if username!=""{
-			fmt.Println(index,">",username)
+			fmt.Println("["+cmd.From+"] ",index,":",username)
 		}
 	}
-
 }

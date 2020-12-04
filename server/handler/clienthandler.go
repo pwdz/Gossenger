@@ -107,7 +107,10 @@ func (server *server) connectTo(cmd command.Command){
 	}	
 	targetChatID := string(cmd.Data)
 	targetChatID = strings.Trim(targetChatID,"\n\r ")
-
+	if client.username == targetChatID{
+		client.sendMsg("[#ERROR] You can't connect to yourself")
+		return
+	}
 
 	_, okClient := server.clients[targetChatID]
 	_, okGroup := server.groups[targetChatID]
@@ -115,8 +118,10 @@ func (server *server) connectTo(cmd command.Command){
 		fmt.Println(">>>>>>>>"+targetChatID)
 		client.targetChatID = targetChatID
 		client.isTargetGp = okGroup	
+		client.sendMsg("You are now connected to "+targetChatID)
 	}else{
-		//ridi no chat!
+		
+		client.sendMsg("[#ERROR] chat id '"+targetChatID+"' doesn't exist")
 	}
 }
 func (server *server) sendUsersList(cmd command.Command){
@@ -141,9 +146,8 @@ func (server *server) quitClient(cmd command.Command){
 	for _,user := range server.clients{
 		user.sendMsg(cmd.From+" left the server!")
 	}
-
 }
-func (server *server)createGp(cmd command.Command){
+func (server *server) createGp(cmd command.Command){
 	gpName := string(cmd.Data)
 
 	client, ok := server.clients[cmd.From]

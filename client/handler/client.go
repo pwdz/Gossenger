@@ -64,8 +64,7 @@ func (client *client) runConsole(){
 
 		input = strings.Replace(input, cmdStr+" ", "", 1)
 		input = strings.Replace(input, "\n", "", 1)
-		fmt.Println(input)
-
+		// fmt.Println(input)
 
 		switch cmdStr{
 		case "/username":
@@ -86,6 +85,8 @@ func (client *client) runConsole(){
 			client.addMembers(input)
 		case "/removemembers":
 			client.removeMembers(input)
+		default:
+			fmt.Println("[$][ERROR] Invalid command")
 		}
 		
 		// input =""
@@ -96,12 +97,12 @@ func (client *client) send(cmd command.Command){
 	encodedData := utils.ToBase64(cmd)
 	encodedData = append(encodedData, constants.Delimiter)
 
-	bytesCount,err := client.conn.Write(encodedData)
+	_,err := client.conn.Write(encodedData)
 	if err != nil{
 		fmt.Println("[#ERROR] Failed to write data to socket")
 	}
 
-	fmt.Printf("[#] sent bytes count: %d\n", bytesCount)
+	// fmt.Printf("[#] sent bytes count: %d\n", bytesCount)
 }
 
 func (client *client) sendUsername(username string){
@@ -128,7 +129,7 @@ func (client *client) sendFile(path string){
 	parts := strings.Split(path, "/")
 	filename := parts[len(parts)-1]
 	if err != nil {
-		fmt.Println("file read riiiiiiiid", err.Error())
+		fmt.Println("[*ERROR] open file problem:", err.Error())
 		return
 	}
 
