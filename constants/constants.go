@@ -11,4 +11,5 @@ const(
 	MaxStreamSize int = 4096
 	//ServerName ...
 	ServerName string = "SERVER"
+	BasePath string = "/home/pwdz/cache/"
 )
