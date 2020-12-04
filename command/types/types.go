@@ -25,10 +25,8 @@ const(
 	// FileToUser
 
 	CreateGp
-	AddMember
-	// ConnToGp
-	// MsgToGp
-	// FileToGp 
+	AddMembers
+	RemoveMembers
 
 	MsgTo
 	FileTo
@@ -37,14 +35,3 @@ const(
 	ServerMsg
 	ServerErr
 )
-
-// var CommandsList []string{"List of available command",
-// 						 "/chusername",
-// 						 "/getusers",
-// 						 "/connuser",
-// 						 "/creategp",
-// 						 "/conngp",
-// 						 "/addmember",
-// 						 "/msg",
-// 						 "/file",
-// 						 "/quit"}
