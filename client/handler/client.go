@@ -11,13 +11,14 @@ import(
 	"os"
 	"Gossenger/command"
 	"Gossenger/command/types"
-	"math"
+	// "math"
 )
 
 type client struct{
 	conn net.Conn
 	username string
 	in chan []byte
+	currFile []byte
 }
 
 func NewClient() *client{
@@ -25,6 +26,7 @@ func NewClient() *client{
 		conn: nil,
 		username: "",
 		in: make(chan []byte, 500),
+		currFile: nil,
 	}
 }
 
@@ -76,11 +78,15 @@ func (client *client) runConsole(){
 			client.sendMsg(input)
 		case "/file":
 			client.sendFile(input)	
+		case "/getusers":
+			client.getUsers()
+		
 		}
 		
 		// input =""
 	}
 }
+
 func (client *client) send(cmd command.Command){
 	encodedData := utils.ToBase64(cmd)
 	encodedData = append(encodedData, constants.Delimiter)
@@ -114,29 +120,22 @@ func (client *client) sendMsg(message string){
 }	
 func (client *client) sendFile(path string){
 	data, err := ReadFile(path)
+	parts := strings.Split(path, "/")
+	filename := parts[len(parts)-1]
 	if err != nil {
 		fmt.Println("file read riiiiiiiid", err.Error())
 		return
 	}
 
 	fileLength := len(data)
-	var packetsCount int = int(math.Ceil(float64(fileLength)/float64(constants.MaxStreamSize)))
-	var packetSize int = constants.MaxStreamSize
-	for i := 0; i < packetsCount; i++ {
-		fmt.Println("[*][FILE] sending packet",i)
-		beginIndex := i*packetSize
-		
-		var endIndex int
-		if fileLength <= (i+1)*packetSize{
-			 endIndex = fileLength
-		}else{
-			 endIndex = (i+1)*packetSize
-		}
-		
-		cmd := command.NewCommand(types.FileTo, data[beginIndex:endIndex], client.username, constants.ServerName)
-		cmd.FollowPackets = packetsCount - 1 - i
-		client.send(*cmd)
-	}
 
+	cmd := command.NewCommand(types.FileTo, data, client.username, constants.ServerName)
+	cmd.Filename = filename
+	client.send(*cmd)
 
+	fmt.Println(filename,fileLength)
+}
+func (client *client) getUsers(){
+	cmd := command.NewCommand(types.GetUsersList, []byte{}, client.username, constants.ServerName)
+	client.send(*cmd)
 }

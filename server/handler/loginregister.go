@@ -69,8 +69,5 @@ func (server *server) checkPassword(cmd command.Command, client *Client){
 	client.send(respCmd)
 }
 func (server *server) loginSuccess(client *Client){
-	fmt.Println(":||||||||||||||||||||||||||||||||||,",len(server.clients))
 	server.clients[client.username] = client
-
-	fmt.Println(":||||||||after,",len(server.clients))
 }

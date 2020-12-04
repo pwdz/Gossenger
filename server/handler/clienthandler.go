@@ -5,6 +5,7 @@ import(
 	"Gossenger/command/types"
 	"strings"
 	"fmt"
+	"Gossenger/constants"
 )
 
 func (client *Client) startListenChannel(server *server){
@@ -19,7 +20,7 @@ func (client *Client) startListenChannel(server *server){
 		case types.ChangeUsername:
 			// server.connectToUser(cmd)
 		case types.GetUsersList:
-			// server.connectToGroup()
+			server.sendUsersList(*cmd)
 		case types.Connect:
 			server.connectTo(*cmd)
 		// case types.ConnToGp:
@@ -35,6 +36,7 @@ func (client *Client) startListenChannel(server *server){
 			// server.sendFle()
 			server.sendMsg(cmd)
 		case types.Quit:
+			server.quitClient(*cmd)
 		default:
 			// server.error()
 		}
@@ -98,7 +100,7 @@ func (server *server) getUsersList(cmd command.Command){
 func (server *server) connectTo(cmd command.Command){
 	client, ok := server.clients[cmd.From]
 	if !ok{
-		fmt.Println("kiriiiiiiii", cmd.From)
+		fmt.Println("[#ERROR] sender 404", cmd.From)
 		return
 	}	
 	targetChatID := string(cmd.Data)
@@ -108,13 +110,30 @@ func (server *server) connectTo(cmd command.Command){
 	_, okClient := server.clients[targetChatID]
 	_, okGroup := server.groups[targetChatID]
 	if okClient || okGroup{
-		fmt.Println("=>>>>>>>>."+targetChatID)
+		fmt.Println(">>>>>>>>"+targetChatID)
 		client.targetChatID = targetChatID
 		client.isTargetGp = okGroup	
 	}else{
 		//ridi no chat!
 	}
 }
-func (server *server) quit(){
+func (server *server) sendUsersList(cmd command.Command){
+	client, ok := server.clients[cmd.From]
+	if !ok{
+		fmt.Println("[#ERROR] sender 404", cmd.From)
+		return
+	}
+	var usersList string = ""
+	for clientName, user := range server.clients{
+		if client != user{
+			usersList +=  clientName+"\n"
+		}
+	}
 
+	respCmd := command.NewCommand(types.GetUsersList, []byte(usersList), constants.ServerName, client.username)
+	client.send(respCmd)
+}
+func (server *server) quitClient(cmd command.Command){
+	delete(server.clients, cmd.From)
+	fmt.Println("[#] client",cmd.From,"left!")
 }

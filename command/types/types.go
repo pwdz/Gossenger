@@ -13,23 +13,29 @@ const(
 	LoginSuccess
 
 	ChangeUsername
+	Success
+	Failure
 
 	NewUserJoined
 	Quit 
 
 	GetUsersList
-	ConnToUser
+	Connect
 	// MsgToUser
 	// FileToUser
 
 	CreateGp
 	AddMember
-	ConnToGp
+	// ConnToGp
 	// MsgToGp
 	// FileToGp 
 
-	Msg
-	File
+	MsgTo
+	FileTo
+	FileACK
+
+	ServerMsg
+	ServerErr
 )
 
 // var CommandsList []string{"List of available command",
