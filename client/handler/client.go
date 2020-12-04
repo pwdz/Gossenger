@@ -135,8 +135,6 @@ func (client *client) sendFile(path string){
 		return
 	}
 
-	fileLength := len(data)
-
 	cmd := command.NewCommand(types.FileTo, data, client.username, constants.ServerName)
 	cmd.Filename = filename
 	client.send(*cmd)

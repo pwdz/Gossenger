@@ -76,8 +76,8 @@ func (server *server) runConsole(){
 		if cmdStr == "/get"{
 			fmt.Println("##################Online Users##################")
 			index := 1;
-			for username := range server.clients{
-				fmt.Println(index,">",username)
+			for username, client := range server.clients{
+				fmt.Println(index,">",username, client.conn.RemoteAddr())
 				index++
 			}
 		}
