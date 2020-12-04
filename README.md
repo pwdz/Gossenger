@@ -1,6 +1,6 @@
 # Gossenger
 Go-Messenger [Client Server App] (🚶‍♂️🚶‍♂️🚶‍♂️🚶‍♂️ **WIP**)  
- First run server.go
+ First run server
  ```
  go run server/cmd/main.go
  ```
