@@ -8,8 +8,8 @@ Go-Messenger [Client Server App] (🚶‍♂️🚶‍♂️🚶‍♂️🚶‍
  ```
  go run client/cmd/main.go
  ```
-Encoding > Base64  
-Database > SQLite    
+Encoding ➡️ Base64  
+Database ➡️ SQLite    
 
 Currently Supported Commands:    
 - **/username [username]**
