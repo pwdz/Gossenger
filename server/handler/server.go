@@ -4,9 +4,10 @@ import(
 	"fmt"
 	"net"
 	"strconv"
-	// "strings"
+	"strings"
 	"Gossenger/command"
-	// "Gossenger/command/types"
+	"bufio"
+	"os"
 )
 const(
 	port = 9000
@@ -27,7 +28,7 @@ func NewServer() *server{
 }
 
 func (server *server) StartListening(){
-	// go server.run()
+	go server.runConsole()
 
 	listener, err := net.Listen("tcp4", ":"+strconv.Itoa(port))
 	if err != nil{
@@ -56,33 +57,27 @@ func (server *server) newConn(conn net.Conn){
 	go newGuest.startListenChannel(server)
 	go newGuest.startWriteChannel()
 }
-// func (server *server) run(){
-// 	fmt.Println("[#] Listening to channel")
-// 	for cmd := range server.commands{
-// 		switch cmd.CmdType{
-// 		case types.EnterUsername:
-// 			// server.checkUsername(*cmd)
-// 		case types.Password:
-// 			// server.checkPassword(*cmd)
-// 		case types.ChangeUsername:
-// 			// server.connectToUser(cmd)
-// 		case types.GetUsersList:
-// 			// server.connectToGroup()
-// 		case types.ConnToUser:
-// 			// server.sendMessageToUser(cmd)
-// 		case types.ConnToGp:
-// 			// server.sendFileToUser()
-// 		case types.CreateGp:
-// 			// server.sendMessageToGroup()
-// 		case types.AddMember: 
-// 			// server.sendFileToGroup()
-// 		case types.MsgTo: 
-// 			// server.quit()
-// 		case types.FileTo: 
-// 		case types.Quit:
-// 		default:
-// 			// server.error()
-// 		}
-// 	}
-// }
+func (server *server) runConsole(){
+	fmt.Println("[$] Starting Console...")
+	// input := ""
+	reader := bufio.NewReader(os.Stdin)
+	for true{
+		input,_ := reader.ReadString('\n')
 
+		cmdStr := strings.Split(input, " ")[0]
+		cmdStr = strings.Trim(cmdStr, "\n\r ")
+
+		input = strings.Replace(input, cmdStr+" ", "", 1)
+		input = strings.Replace(input, "\n", "", 1)
+		
+		if cmdStr == "/get"{
+			fmt.Println("##################Online Users##################")
+			index := 1;
+			for username := range server.clients{
+				fmt.Println(index,">",username)
+				index++
+			}
+		}
+		
+	}
+}
