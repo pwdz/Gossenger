@@ -1,6 +1,5 @@
 # Gossenger
-Go-Messenger [Client Server App]  
-🚶‍♂️🚶‍♂️🚶‍♂️🚶‍♂️ **WIP**  
+Go-Messenger [Client Server App] (🚶‍♂️🚶‍♂️🚶‍♂️🚶‍♂️ **WIP**)  
  First run server.go
  ```
  go run server/cmd/main.go
@@ -9,6 +8,8 @@ Go-Messenger [Client Server App]
  ```
  go run client/cmd/main.go
  ```
+Encoding > Base64  
+Database > SQLite    
 
 Currently Supported Commands:    
 - **/username [username]**
