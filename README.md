@@ -24,7 +24,7 @@ Currently Supported Commands:
   
 TODO:  
 - Save username & passwords ✅  
-- Add GUI
-- Save messages in db
+- Save messages
 - Save files
 - save groups
+- Add GUI
