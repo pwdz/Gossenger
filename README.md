@@ -23,6 +23,7 @@ Currently Supported Commands:
 - **/removemembers [UserID1] [UserID2] ...** (Permission: Group Admin)
   
 TODO:  
+- Save username & passwords ✅  
 - Add GUI
 - Save messages in db
 - Save files
