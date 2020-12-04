@@ -1,7 +1,14 @@
 # Gossenger
 Go-Messenger [Client Server App]  
 🚶‍♂️🚶‍♂️🚶‍♂️🚶‍♂️ **WIP**  
-
+ First run server.go
+ ```
+ go run server/cmd/main.go
+ ```
+ Then run clients
+ ```
+ go run client/cmd/main.go
+ ```
 
 Currently Supported Commands:    
 - **/username [username]**
