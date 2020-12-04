@@ -12,4 +12,6 @@ const(
 	//ServerName ...
 	ServerName string = "SERVER"
 	BasePath string = "/home/pwdz/cache/"
+	DBBasePath string = "/home/pwdz/GossengerServer/"
+	DBName string = "Users.db"
 )

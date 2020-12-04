@@ -44,11 +44,15 @@ func (client *client) startReadChannel(){
 			client.receiveFile(cmd)
 		case types.GetUsersList:
 			client.receiveUsersList(cmd)
+		case types.Failure:
+			client.wrongPassword(cmd)
 		}
 
 	}
 }
-
+func (client *client) wrongPassword(cmd command.Command){
+	fmt.Println("["+cmd.From+"] Incorrect password")
+}
 
 func (client *client) receiveEnterUsername(cmd command.Command){
 	fmt.Println("["+cmd.From+"] "+string(cmd.Data))
@@ -66,7 +70,7 @@ func (client *client) receiveMsgTo(cmd command.Command){
 
 func (client *client) usernameSuccess(cmd command.Command){
 	client.username = string(cmd.Data)
-	fmt.Println("["+cmd.From+"] username set successfully: "+client.username)
+	fmt.Println("["+cmd.From+"] username>: "+client.username)
 }
 
 func (client *client) receiveFile(cmd command.Command){

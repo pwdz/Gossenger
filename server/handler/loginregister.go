@@ -15,22 +15,18 @@ func (server *server) checkUsername(cmd command.Command, client *Client){
 
 	username := string(cmd.Data)
 	username = strings.Trim(username,"\n\r ")
-	//TODO
-	//TODO
-	//TODO
+
 	respMsg := "" 
-	fmt.Println("Do this shit")
-	if false{//Username already exists
-		// client.sendMsg("[SERVER] Please enter password")
+	if server.db.DoesExist(username){//Username already exists
 		client.isGuest = false;
-		respMsg = "Welcome "+username+". Please enter password. >/password $$password$$"
+		client.username = username 
+		respMsg = "Welcome back "+username+". Please enter password. >/password $$password$$"
 	}else{//New Username
 		client.isGuest = true;
 		client.username = username 
 		respMsg = "Welcome "+username+". Please set your password. >/password $$password$$"
 	}
 
-	fmt.Println("Do this shit2")
 	client.sendMsg(respMsg)
 }
 
@@ -40,7 +36,7 @@ func (server *server) checkPassword(cmd command.Command, client *Client){
 
 	respCmd := command.NewCommand(-1, []byte{}, constants.ServerName ,client.username)	
 
-	if true{
+	if client.isGuest{
 		//Guest choosed a password
 		client.isLoggedIn = true
 		client.isGuest = false
@@ -49,20 +45,25 @@ func (server *server) checkPassword(cmd command.Command, client *Client){
 		respCmd.Data = []byte(client.username)
 
 		//Save username and password		
+		server.db.AddData(client.username, password)
+
 		server.loginSuccess(client)
 	}else{
 		//Check if password is correct
 		//Send the proper message
-		if password == "1234"{
+
+		if password == server.db.GetPassword(client.username){
 			respCmd.CmdType = types.LoginSuccess
 			respCmd.Data = []byte(client.username)
 			
 			server.loginSuccess(client)
+			client.isLoggedIn = true
+			client.isGuest = false
+	
 
 		}else{
 			respCmd.CmdType = types.Failure
-			respCmd.Data = []byte("")
-		
+			respCmd.Data = []byte("")		
 		}
 	}
 

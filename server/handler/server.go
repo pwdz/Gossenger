@@ -8,6 +8,7 @@ import(
 	"Gossenger/command"
 	"bufio"
 	"os"
+	"Gossenger/db"
 )
 const(
 	port = 9000
@@ -17,6 +18,7 @@ type server struct{
 	groups map[string]*group //gpName, group struct
 	clients map[string]*Client//clientName,Client struct 
 	commands chan *command.Command
+	db *db.DB
 }
 
 func NewServer() *server{
@@ -24,6 +26,7 @@ func NewServer() *server{
 		groups: make(map[string]*group),
 		clients: make(map[string]*Client),
 		commands: make(chan *command.Command, 50),
+		db: db.CreateDB(),
 	}
 }
 

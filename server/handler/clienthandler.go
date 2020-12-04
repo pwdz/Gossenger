@@ -11,20 +11,17 @@ import(
 func (client *Client) startListenChannel(server *server){
 	fmt.Println("[#] Listening to channel")
 	for cmd := range client.in{
-		// fmt.Printf("[#] Command in listener for client %s\n", client.conn.RemoteAddr())
 		switch cmd.CmdType{
 		case types.EnterUsername:
 			server.checkUsername(*cmd, client)
 		case types.Password:
 			server.checkPassword(*cmd, client)
 		case types.ChangeUsername:
-			// server.connectToUser(cmd)
+			server.changeUsername(*cmd)
 		case types.GetUsersList:
 			server.sendUsersList(*cmd)
 		case types.Connect:
 			server.connectTo(*cmd)
-		// case types.ConnToGp:
-			// server.sendFileToUser()
 		case types.CreateGp:
 			server.createGp(*cmd)
 		case types.AddMembers: 
@@ -33,9 +30,7 @@ func (client *Client) startListenChannel(server *server){
 			server.removeClientsFromGp(*cmd)
 		case types.MsgTo: 
 			server.sendMsg(cmd)
-			// server.quit()
 		case types.FileTo: 
-			// server.sendFle()
 			server.sendMsg(cmd)
 		case types.Quit:
 			server.quitClient(*cmd)
@@ -58,11 +53,22 @@ func (server *server) changeUsername(cmd command.Command){
 	// respCmd := command.NewCommand()
 
 	//Check usernames in db
-	if false{//Username already exists
-
+	if server.db.DoesExist(newUsername){//Username already exists
+		client.sendMsg("[#ERROR] Username is in use.")
 	}else{//Username is not taken
-		client.username = newUsername
+		oldname := client.username
 		//save in db
+		server.db.ChangeUsername(oldname, newUsername)
+		client.username = newUsername
+
+		respCmd := command.NewCommand(types.LoginSuccess, []byte(newUsername), constants.ServerName, newUsername)
+		client.send(respCmd)
+
+		delete(server.clients, oldname)
+		server.clients[newUsername] = client
+
+
+	
 	}
 
 }

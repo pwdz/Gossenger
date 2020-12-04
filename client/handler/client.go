@@ -85,6 +85,8 @@ func (client *client) runConsole(){
 			client.addMembers(input)
 		case "/removemembers":
 			client.removeMembers(input)
+		case "/changeusername":
+			client.changeUsername(input)
 		default:
 			fmt.Println("[$][ERROR] Invalid command")
 		}
@@ -139,7 +141,6 @@ func (client *client) sendFile(path string){
 	cmd.Filename = filename
 	client.send(*cmd)
 
-	fmt.Println(filename,fileLength)
 }
 func (client *client) getUsers(){
 	cmd := command.NewCommand(types.GetUsersList, []byte{}, client.username, constants.ServerName)
@@ -157,5 +158,9 @@ func (client *client) addMembers(members string){
 }
 func (client *client) removeMembers(members string){
 	cmd := command.NewCommand(types.RemoveMembers, []byte(members), client.username, constants.ServerName)
+	client.send(*cmd)
+}
+func (client *client) changeUsername(newname string){
+	cmd := command.NewCommand(types.ChangeUsername, []byte(newname), client.username, constants.ServerName)
 	client.send(*cmd)
 }
