@@ -1,5 +1,5 @@
 # Gossenger
-Go-Messenger [Client Server App] 🚶‍♂️🚶‍♂️🚶‍♂️🚶‍♂️
+Go-Messenger [Client Server App] 🚶‍♂️🚶‍♂️🚶‍♂️🚶‍♂️  
  First run server
  ```
  go run server/cmd/main.go
