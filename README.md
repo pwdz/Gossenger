@@ -1,5 +1,5 @@
 # Gossenger
-Go-Messenger [Client Server App] (🚶‍♂️🚶‍♂️🚶‍♂️🚶‍♂️ **WIP**)  
+Go-Messenger [Client Server App] 🚶‍♂️🚶‍♂️🚶‍♂️🚶‍♂️
  First run server
  ```
  go run server/cmd/main.go
@@ -20,10 +20,11 @@ Currently Supported Commands:
 - **/file [path]**
 - **/creategp [gpName]** (Default Admin: Group creator) 
 - **/addmembers [UserID1] [UserID2] ...** (Permission: Group Member)
-- **/removemembers [UserID1] [UserID2] ...** (Permission: Group Admin)
+- **/removemembers [UserID1] [UserID2] ...** (Permission: Group Admin)  
+
+After registeration, username and password will be saved in database
   
 TODO:  
-- Save username & passwords ✅  
 - Save messages
 - Save files
 - save groups
